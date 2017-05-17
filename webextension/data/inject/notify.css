@@ -1,0 +1,32 @@
+.itrisearch-notification {
+  position: fixed;
+  z-index: 2147483646;
+  right: 20px;
+  bottom: 20px;
+  width: 250px;
+  height: 40px;
+  line-height: 40px;
+  background-color: #FFF;
+  border: solid 2px gray;
+  padding: 0 5px;
+  box-shadow: 1px 1px 5px #aaa;
+  color: #222;
+  font-family: arial,sans-serif !important;
+  font-size: 12px !important;
+}
+.itrisearch-notification button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAMAAADXEh96AAAAilBMVEVEREBEREBEREBEREBEREBEREBEREAlJSMSEhE3NzQAAAAAAAAQEA8BAQEAAAAAAAAAAAAAAAAvLywBAQEAAAAAAAAcHBoAAAAAAAAAAAAAAAAAAAAyMi8AAAAAAAABAQELCwo4ODUAAAAAAAAWFhUsLCkKCgkDAwIAAAAAAAAtLSoCAgIHBwcAAACgX5xYAAAAAXRSTlMAQObYZgAAAAFiS0dEAIgFHUgAAAAJcEhZcwAAXEYAAFxGARSUQ0EAAAAHdElNRQffBAgGGDS4qporAAAAG0lEQVQI12NgZGRgAGJGMGBggJAMCA5YDsQEAAJ2AB0Q4n77AAAAAElFTkSuQmCC) center center no-repeat;
+  width: 12px;
+  height: 12px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.itrisearch-notification button:hover {
+  opacity: 1.0;
+}

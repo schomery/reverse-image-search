@@ -1,0 +1,1 @@
+../../../../easy-screenshot/webextension/data/inject/inject.js

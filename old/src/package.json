@@ -1,0 +1,15 @@
+{
+  "title": "Capture, TinEye Reverse Image Search",
+  "name": "itrisearch",
+  "description": "is a powerful capturing reverse image search tool built on top of TinEye engine.",
+  "id": "jid0-iiiWfb12bgHj8iKloOou74fb6jh@jetpack",
+  "license": "mozilla public license 1.1",
+  "version": "0.1.1",
+  "author": "Jeremy Schomery",
+  "main": "./lib/common.js",
+  "url": "http://mybrowseraddon.com/tineye.html",
+  "permissions": {
+    "private-browsing": true,
+    "multiprocess": true
+  }
+}
