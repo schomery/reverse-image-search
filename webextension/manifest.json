@@ -1,14 +1,12 @@
 {
   "name": "Reverse Image Search",
-  "short_name": "itrisearch",
-  "description": "is a powerful capturing reverse image search tool built on top of TinEye/Google Image engines",
+  "description": "a powerful capturing reverse image search tool built on top of TinEye/Google Images engines",
   "author": "Jeremy Schomery",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "manifest_version": 2,
   "permissions": [
     "storage",
-    "tabs",
-    "<all_urls>",
+    "activeTab",
     "contextMenus"
   ],
   "background":{
@@ -17,7 +15,7 @@
       "background.js"
     ]
   },
-  "homepage_url": "http://mybrowseraddon.com/tineye.html",
+  "homepage_url": "https://add0n.com/reverse-image-search.html",
   "icons": {
     "16": "data/icons/16.png",
     "24": "data/icons/24.png",
@@ -27,9 +25,5 @@
     "128": "data/icons/128.png",
     "256": "data/icons/256.png"
   },
-  "applications": {
-    "gecko": {
-      "id": "jid0-iiiWfb12bgHj8iKloOou74fb6jh@jetpack"
-    }
-  }
+  "browser_action": {}
 }

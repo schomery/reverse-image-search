@@ -2,11 +2,10 @@
 
 if (!HTMLCanvasElement.prototype.toBlob) {
   Object.defineProperty(HTMLCanvasElement.prototype, 'toBlob', {
-    value: function (callback, type, quality) {
-
-      const binStr = atob(this.toDataURL(type, quality).split(',')[1]),
-        len = binStr.length,
-        arr = new Uint8Array(len);
+    value: function(callback, type, quality) {
+      const binStr = atob(this.toDataURL(type, quality).split(',')[1]);
+      const len = binStr.length;
+      const arr = new Uint8Array(len);
 
       for (let i = 0; i < len; i++) {
         arr[i] = binStr.charCodeAt(i);
@@ -17,32 +16,36 @@ if (!HTMLCanvasElement.prototype.toBlob) {
   });
 }
 
-chrome.contextMenus.create({
-  'id': 'search-link-google',
-  'type': 'normal',
-  'title': 'Image URL (Google Image)',
-  'contexts': ['image']
-});
-chrome.contextMenus.create({
-  'id': 'search-link-tineye',
-  'type': 'normal',
-  'title': 'Image URL (Tineye)',
-  'contexts': ['image']
-});
-chrome.contextMenus.create({
-  'id': 'capture-google',
-  'type': 'normal',
-  'title': 'Capture (Google Image)',
-  'contexts': ['page']
-});
-chrome.contextMenus.create({
-  'id': 'capture-tineye',
-  'type': 'normal',
-  'title': 'Capture (TinEye)',
-  'contexts': ['page']
-});
+function onStart() {
+  chrome.contextMenus.create({
+    'id': 'search-link-google',
+    'type': 'normal',
+    'title': 'Google Images (Image URL)',
+    'contexts': ['image']
+  });
+  chrome.contextMenus.create({
+    'id': 'search-link-tineye',
+    'type': 'normal',
+    'title': 'Tineye (Image URL)',
+    'contexts': ['image']
+  });
+  chrome.contextMenus.create({
+    'id': 'capture-google',
+    'type': 'normal',
+    'title': 'Google Images (Capture)',
+    'contexts': ['page']
+  });
+  // chrome.contextMenus.create({
+  //   'id': 'capture-tineye',
+  //   'type': 'normal',
+  //   'title': 'TinEye (Capture)',
+  //   'contexts': ['page']
+  // });
+}
+chrome.runtime.onInstalled.addListener(onStart);
+chrome.runtime.onStartup.addListener(onStart);
 
-function notify (id, msg) {
+function notify(id, msg) {
   chrome.tabs.insertCSS(id, {
     file: 'data/inject/notify.css'
   }, () => {
@@ -56,7 +59,7 @@ function notify (id, msg) {
   });
 }
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+const onClick = (info, tab) => {
   if (info.menuItemId.startsWith('capture-')) {
     chrome.tabs.insertCSS(tab.id, {
       file: 'data/inject/inject.css'
@@ -74,21 +77,9 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     const tineye = info.menuItemId.endsWith('tineye');
 
     if (tineye) {
-      notify(tab.id, `Uploading image to TinEye. Please wait ...`);
-      const formData = new window.FormData();
-      formData.processData = false;
-      formData.contentType = false;
-      formData.append('url', info.srcUrl);
-      const req = new window.XMLHttpRequest();
-      req.onload = () => {
-        chrome.tabs.create({
-          url: req.responseURL
-        });
-        notify(tab.id, '');
-      };
-      req.onerror = (e) => notify(tab.id, 'Failed! ' + (e.message || e));
-      req.open('POST', 'https://www.tineye.com/search', true);
-      req.send(formData);
+      chrome.tabs.create({
+        url: 'https://tineye.com/search/?pluginver=chrome-1.3.0&url=' + encodeURIComponent(info.srcUrl)
+      });
     }
     else {
       chrome.tabs.create({
@@ -96,13 +87,27 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       });
     }
   }
+};
+
+chrome.contextMenus.onClicked.addListener(onClick);
+chrome.browserAction.onClicked.addListener(tab => {
+  onClick({
+    menuItemId: 'capture-google'
+  }, tab);
 });
 
-function capture (request, sender) {
-  const {width, height, left, top, service = 'TinEye'} = request;
+function capture(request, sender) {
+  const {devicePixelRatio, service = 'TinEye'} = request;
+
+  let {left, top, width, height} = request;
+  left *= devicePixelRatio;
+  top *= devicePixelRatio;
+  width *= devicePixelRatio;
+  height *= devicePixelRatio;
+
   notify(sender.tab.id, `Uploading image to ${service}. Please wait ...`);
 
-  chrome.tabs.captureVisibleTab(sender.tab.windowId, {format: 'png'}, (dataUrl) => {
+  chrome.tabs.captureVisibleTab(sender.tab.windowId, {format: 'png'}, dataUrl => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -115,7 +120,7 @@ function capture (request, sender) {
       else {
         ctx.drawImage(img, 0, 0);
       }
-      canvas.toBlob((blob) => {
+      canvas.toBlob(blob => {
         const formData = new window.FormData();
         formData.processData = false;
         formData.contentType = false;
@@ -134,12 +139,12 @@ function capture (request, sender) {
           });
           notify(sender.tab.id);
         };
-        req.onerror = (e) => notify(sender.tab.id, 'Failed! ' + (e.message || e));
+        req.onerror = e => notify(sender.tab.id, 'Failed! ' + (e.message || e));
         if (service === 'Google') {
           req.open('POST', 'https://www.google.com/searchbyimage/upload', true);
         }
         else {
-          req.open('POST', 'https://www.tineye.com/search', true);
+          req.open('POST', 'https://tineye.com/result_json/?token=', true);
         }
         req.send(formData);
       });
@@ -150,20 +155,29 @@ function capture (request, sender) {
 
 chrome.runtime.onMessage.addListener(capture);
 
-//
-chrome.storage.local.get('version', prefs => {
-  let version = chrome.runtime.getManifest().version;
-  let isFirefox = navigator.userAgent.indexOf('Firefox') !== -1;
-  if (isFirefox ? !prefs.version : prefs.version !== version) {
-    chrome.storage.local.set({version}, () => {
-      chrome.tabs.create({
-        url: 'http://mybrowseraddon.com/tineye.html?version=' + version +
-          '&type=' + (prefs.version ? ('upgrade&p=' + prefs.version) : 'install')
-      });
+/* FAQs & Feedback */
+{
+  const {management, runtime: {onInstalled, setUninstallURL, getManifest}, storage, tabs} = chrome;
+  if (navigator.webdriver !== true) {
+    const page = getManifest().homepage_url;
+    const {name, version} = getManifest();
+    onInstalled.addListener(({reason, previousVersion}) => {
+      management.getSelf(({installType}) => installType === 'normal' && storage.local.get({
+        'faqs': true,
+        'last-update': 0
+      }, prefs => {
+        if (reason === 'install' || (prefs.faqs && reason === 'update')) {
+          const doUpdate = (Date.now() - prefs['last-update']) / 1000 / 60 / 60 / 24 > 45;
+          if (doUpdate && previousVersion !== version) {
+            tabs.create({
+              url: page + '?version=' + version + (previousVersion ? '&p=' + previousVersion : '') + '&type=' + reason,
+              active: reason === 'install'
+            });
+            storage.local.set({'last-update': Date.now()});
+          }
+        }
+      }));
     });
+    setUninstallURL(page + '?rd=feedback&name=' + encodeURIComponent(name) + '&version=' + version);
   }
-});
-(function () {
-  let {version} = chrome.runtime.getManifest();
-  chrome.runtime.setUninstallURL('http://mybrowseraddon.com/tineye.html?type=uninstall' + '&v=' + version);
-})();
+}
