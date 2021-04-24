@@ -2,12 +2,14 @@
   "name": "Reverse Image Search",
   "description": "a powerful capturing reverse image search tool built on top of TinEye/Google Images engines",
   "author": "Jeremy Schomery",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "manifest_version": 2,
   "permissions": [
     "storage",
     "activeTab",
-    "contextMenus"
+    "contextMenus",
+    "https://*.google.com/",
+    "https://tineye.com/"
   ],
   "background":{
     "persistent": false,
