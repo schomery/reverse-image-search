@@ -8,8 +8,7 @@
     "storage",
     "activeTab",
     "contextMenus",
-    "https://*.google.com/",
-    "https://tineye.com/"
+    "https://www.google.com/searchbyimage/upload"
   ],
   "background":{
     "persistent": false,
