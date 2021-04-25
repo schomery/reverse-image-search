@@ -1,0 +1,29 @@
+{
+  "name": "Reverse Image Search",
+  "description": "a powerful capturing reverse image search tool built on top of TinEye/Google Images engines",
+  "author": "Jeremy Schomery",
+  "version": "0.2.2",
+  "manifest_version": 2,
+  "permissions": [
+    "storage",
+    "<all_urls>",
+    "contextMenus"
+  ],
+  "background":{
+    "persistent": false,
+    "scripts":[
+      "background.js"
+    ]
+  },
+  "homepage_url": "https://add0n.com/reverse-image-search.html",
+  "icons": {
+    "16": "data/icons/16.png",
+    "24": "data/icons/24.png",
+    "32": "data/icons/32.png",
+    "48": "data/icons/48.png",
+    "64": "data/icons/64.png",
+    "128": "data/icons/128.png",
+    "256": "data/icons/256.png"
+  },
+  "browser_action": {}
+}

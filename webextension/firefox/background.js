@@ -19,28 +19,29 @@ if (!HTMLCanvasElement.prototype.toBlob) {
 function onStart() {
   chrome.contextMenus.create({
     'id': 'search-link-google',
-    'type': 'normal',
     'title': 'Google Images (Image URL)',
     'contexts': ['image']
   });
   chrome.contextMenus.create({
     'id': 'search-link-tineye',
-    'type': 'normal',
     'title': 'Tineye (Image URL)',
     'contexts': ['image']
   });
   chrome.contextMenus.create({
     'id': 'capture-google',
-    'type': 'normal',
     'title': 'Google Images (Capture)',
     'contexts': ['page']
   });
   // chrome.contextMenus.create({
   //   'id': 'capture-tineye',
-  //   'type': 'normal',
   //   'title': 'TinEye (Capture)',
   //   'contexts': ['page']
   // });
+  chrome.contextMenus.create({
+    'id': 'preview',
+    'title': 'Usage Preview',
+    'contexts': ['browser_action']
+  });
 }
 chrome.runtime.onInstalled.addListener(onStart);
 chrome.runtime.onStartup.addListener(onStart);
@@ -60,7 +61,12 @@ function notify(id, msg) {
 }
 
 const onClick = (info, tab) => {
-  if (info.menuItemId.startsWith('capture-')) {
+  if (info.menuItemId === 'preview') {
+    chrome.tabs.create({
+      url: 'https://www.youtube.com/watch?v=KiBNYb3yuSo'
+    });
+  }
+  else if (info.menuItemId.startsWith('capture-')) {
     chrome.tabs.insertCSS(tab.id, {
       file: 'data/inject/inject.css'
     }, () => {
@@ -169,10 +175,11 @@ chrome.runtime.onMessage.addListener(capture);
         if (reason === 'install' || (prefs.faqs && reason === 'update')) {
           const doUpdate = (Date.now() - prefs['last-update']) / 1000 / 60 / 60 / 24 > 45;
           if (doUpdate && previousVersion !== version) {
-            tabs.create({
+            tabs.query({active: true, currentWindow: true}, tbs => tabs.create({
               url: page + '?version=' + version + (previousVersion ? '&p=' + previousVersion : '') + '&type=' + reason,
-              active: reason === 'install'
-            });
+              active: reason === 'install',
+              ...(tbs && tbs.length && {index: tbs[0].index + 1})
+            }));
             storage.local.set({'last-update': Date.now()});
           }
         }
