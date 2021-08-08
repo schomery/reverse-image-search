@@ -1,1 +1,0 @@
-../firefox/background.js
